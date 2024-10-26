@@ -1,0 +1,2 @@
+# generique
+Go Generic Toolkit
