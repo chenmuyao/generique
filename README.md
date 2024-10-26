@@ -1,2 +1,36 @@
-# generique
-Go Generic Toolkit
+# Generique - Go Generics Toolkit
+
+- [ ] Slice helpers
+  - [ ] Delete
+  - [X] Find
+  - [ ] Filter
+  - [ ] MapReduce
+  - [ ] Set Operations
+    - [ ] Intersection
+    - [ ] Union
+      - [ ] Difference
+- [ ] List
+  - [ ] ArrayList
+  - [ ] LinkedList
+- [ ] Queue
+  - [ ] By ArrayList
+  - [ ] By LinkedList
+  - [ ] Priority Queue
+- [ ] Stack
+- [ ] Heap
+- [ ] Skip list
+- [ ] SortedSet based on skip list
+- [ ] HashSet
+- [ ] TreeSet
+- [ ] Red-Black Tree
+- [ ] TreeMap based on Red-Black Tree
+- [ ] TreeSet based on Red-Black Tree
+- [ ] HashMap based on built-in map
+- [ ] LinkedMap
+- [ ] Concurrent Queue
+  - [ ] Concurrent Queue
+  - [ ] Concurrent Blocking Queue
+  - [ ] Concurrent Blocking Priority Queue
+- [ ] Local Memory Cache (Redis compatible)
+- [ ] B Tree
+- [ ] B+ Tree
