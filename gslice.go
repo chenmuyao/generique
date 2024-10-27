@@ -122,3 +122,70 @@ func Insert[T any](index int, val T, vals []T) ([]T, error) {
 
 	return vals, nil
 }
+
+// DeleteV1 appends 2 sections of slices
+func DeleteV1[T any](index int, vals []T) ([]T, error) {
+	n := len(vals)
+	if index < 0 || index >= n {
+		var zero []T
+		return zero, ErrInvalidIndex[T]{Index: index, Size: n}
+	}
+
+	vals = append(vals[:index], vals[index+1:]...)
+	return vals, nil
+}
+
+// DeleteV1 moves memory
+func DeleteV2[T any](index int, vals []T) ([]T, error) {
+	n := len(vals)
+	if index < 0 || index >= n {
+		var zero []T
+		return zero, ErrInvalidIndex[T]{Index: index, Size: n}
+	}
+
+	for i := index; i < n; i++ {
+		if i+1 < n {
+			vals[i] = vals[i+1]
+		}
+	}
+
+	vals = vals[:n-1]
+	return vals, nil
+}
+
+func DeleteUnordered[T any](index int, vals []T) ([]T, error) {
+	n := len(vals)
+	if index < 0 || index >= n {
+		var zero []T
+		return zero, ErrInvalidIndex[T]{Index: index, Size: n}
+	}
+
+	vals[index] = vals[n-1]
+	return vals[:n-1], nil
+}
+
+func DeleteShrink[T any](
+	index int,
+	vals []T,
+	deletFn func(idx int, vals []T) ([]T, error),
+) ([]T, error) {
+	// Shrinking means memory copy. So we shrink only when the size is a half
+	// of the original slice. And we keep 25% capacity for future growth
+
+	vals, err := deletFn(index, vals)
+	if err != nil {
+		return vals, nil
+	}
+
+	oldLen := len(vals)
+	oldCap := cap(vals)
+
+	if oldLen < oldCap/2 {
+		newCap := int(float64(oldCap/2) * 1.25)
+		newVals := make([]T, oldLen, newCap)
+		copy(newVals, vals)
+		return newVals, nil
+	}
+
+	return vals, nil
+}

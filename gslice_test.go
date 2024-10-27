@@ -23,6 +23,7 @@
 package generique
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -241,4 +242,104 @@ func TestGSliceInsert(t *testing.T) {
 			assert.Equal(t, tc.Want, got)
 		})
 	}
+}
+
+func testGSliceDelete(
+	t *testing.T,
+	deleteFn func(index int, vals []int) ([]int, error),
+	funcName string,
+) {
+	t.Run(funcName+"invalid index", func(t *testing.T) {
+		var empty []int
+
+		_, err := deleteFn(1, empty)
+		assert.ErrorIs(t, err, ErrInvalidIndex[int]{1, 0})
+
+		_, err = deleteFn(-1, empty)
+		assert.ErrorIs(t, err, ErrInvalidIndex[int]{-1, 0})
+	})
+
+	testCases := []struct {
+		Name      string
+		BaseSlice []int
+		Index     int
+		Want      []int
+	}{
+		{
+			funcName + "delete head",
+			[]int{3, 2, 1},
+			0,
+			[]int{2, 1},
+		},
+		{
+			funcName + "delete middle",
+			[]int{3, 2, 1},
+			1,
+			[]int{3, 1},
+		},
+		{
+			funcName + "delete tail",
+			[]int{3, 2, 1},
+			2,
+			[]int{3, 2},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.Name, func(t *testing.T) {
+			got, err := deleteFn(tc.Index, tc.BaseSlice)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.Want, got)
+		})
+	}
+}
+
+func TestGSliceDelete(t *testing.T) {
+	testGSliceDelete(t, DeleteV1[int], "DeleteV1")
+	testGSliceDelete(t, DeleteV2[int], "DeleteV2")
+}
+
+func benchmarkDelete(b *testing.B, size int, deleteFn func(index int, vals []int) ([]int, error)) {
+	original := make([]int, size)
+	for i := 0; i < size; i++ {
+		original[i] = i
+	}
+
+	b.ResetTimer()
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		integers := make([]int, len(original))
+		copy(integers, original)
+
+		_, _ = deleteFn(b.N/2, integers)
+	}
+}
+
+func BenchmarkGSliceDelete(b *testing.B) {
+	sizes := []int{10, 100, 1000, 1000000}
+	for _, size := range sizes {
+		b.Run(fmt.Sprintf("DeleteV1-%d", size), func(b *testing.B) {
+			benchmarkDelete(b, size, DeleteV1[int])
+		})
+		b.Run(fmt.Sprintf("DeleteV2-%d", size), func(b *testing.B) {
+			benchmarkDelete(b, size, DeleteV2[int])
+		})
+		b.Run(fmt.Sprintf("DeleteUnordered-%d", size), func(b *testing.B) {
+			benchmarkDelete(b, size, DeleteUnordered[int])
+		})
+	}
+}
+
+func TestGSliceDeleteShrinkV1(t *testing.T) {
+	original := make([]int, 20)
+	for i := 0; i < 20; i++ {
+		original[i] = i
+	}
+
+	for i := 0; i < 11; i++ {
+		original, _ = DeleteShrink(0, original, DeleteV1)
+	}
+
+	assert.Equal(t, 12, cap(original))
 }
