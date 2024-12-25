@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package generique
+package gslice
 
 type Number interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 |
