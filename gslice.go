@@ -189,3 +189,12 @@ func DeleteShrink[T any](
 
 	return vals, nil
 }
+
+func Map[In any, Out any](s []In, mapper func(id int, src In) Out) []Out {
+	res := make([]Out, len(s))
+	for i, el := range s {
+		o := mapper(i, el)
+		res[i] = o
+	}
+	return res
+}

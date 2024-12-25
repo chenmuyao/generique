@@ -34,3 +34,5 @@
 - [ ] Local Memory Cache (Redis compatible)
 - [ ] B Tree
 - [ ] B+ Tree
+
+- JSONColumn Struct that implements `sql.Scanner` and `driver.Valuer` (like `sql.NullString`)

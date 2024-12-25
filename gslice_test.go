@@ -343,3 +343,12 @@ func TestGSliceDeleteShrinkV1(t *testing.T) {
 
 	assert.Equal(t, 12, cap(original))
 }
+
+func TestMap(t *testing.T) {
+	input := []int{1, 2, 3, 4, 5}
+	expected := []int{2, 4, 6, 8, 10}
+	actual := Map(input, func(id int, src int) int {
+		return src * 2
+	})
+	assert.Equal(t, expected, actual)
+}
