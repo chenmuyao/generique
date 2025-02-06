@@ -109,3 +109,10 @@ func (p *PriorityQueue[T]) Dequeue() (T, error) {
 	}
 	return ret, nil
 }
+
+func (p *PriorityQueue[T]) Len() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return p.pq.Len()
+}
