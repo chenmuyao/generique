@@ -79,19 +79,18 @@ func (p *PriorityQueue[T]) Enqueue(elem T) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
+	// First push
+	heap.Push(&p.pq, elem)
+
 	if p.pq.capacity > 0 {
-		if p.pq.Len() < p.pq.capacity {
+		if p.pq.Len() <= p.pq.capacity {
 			// if not reached, just return
-			heap.Push(&p.pq, elem)
 			return
 		}
 
 		// if the capacity is reached, we have to take out the last element
-		_ = heap.Remove(&p.pq, p.pq.capacity-1)
+		heap.Pop(&p.pq)
 	}
-
-	// Then push
-	heap.Push(&p.pq, elem)
 }
 
 func (p *PriorityQueue[T]) Dequeue() (T, error) {
