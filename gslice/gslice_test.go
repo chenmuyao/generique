@@ -352,3 +352,24 @@ func TestMap(t *testing.T) {
 	})
 	assert.Equal(t, expected, actual)
 }
+
+func TestToSet(t *testing.T) {
+	input := []int{1, 2, 3, 4, 5, 5, 5}
+	expected := map[int]struct{}{
+		1: {},
+		2: {},
+		3: {},
+		4: {},
+		5: {},
+	}
+	actual := ToSet(input)
+	assert.Equal(t, expected, actual)
+}
+
+func TestDiffSet(t *testing.T) {
+	src := []int{1, 2, 3, 4, 5, 5, 5, 7}
+	dst := []int{1, 2, 3, 4, 5, 5, 5, 6}
+	expected := []int{6}
+	actual := DiffSet(src, dst)
+	assert.Equal(t, expected, actual)
+}

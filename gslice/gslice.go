@@ -198,3 +198,29 @@ func Map[In any, Out any](s []In, mapper func(id int, src In) Out) []Out {
 	}
 	return res
 }
+
+// Get the diff of dsts - srcs
+func DiffSet[T comparable](srcs, dsts []T) []T {
+	srcSet := ToSet(srcs)
+	dstSet := ToSet(dsts)
+
+	diff := make([]T, 0, min(len(srcs), len(dsts)))
+
+	for key := range dstSet {
+		if _, ok := srcSet[key]; !ok {
+			diff = append(diff, key)
+		}
+	}
+
+	return diff
+}
+
+func ToSet[T comparable](in []T) map[T]struct{} {
+	set := make(map[T]struct{}, len(in))
+
+	for _, el := range in {
+		set[el] = struct{}{}
+	}
+
+	return set
+}
