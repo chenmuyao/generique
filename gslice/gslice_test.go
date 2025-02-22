@@ -373,3 +373,13 @@ func TestDiffSet(t *testing.T) {
 	actual := DiffSet(src, dst)
 	assert.Equal(t, expected, actual)
 }
+
+func TestDiffSetFunc(t *testing.T) {
+	src := []int{1, 2, 3, 4, 5, 5, 5, 7}
+	dst := []int{1, 2, 3, 4, 5, 5, 5, 6}
+	expected := []int{6}
+	actual := DiffSetFunc(src, dst, func(src, dst int) bool {
+		return src == dst
+	})
+	assert.Equal(t, expected, actual)
+}

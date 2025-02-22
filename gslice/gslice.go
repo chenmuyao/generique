@@ -86,6 +86,24 @@ func Find[T any](vals []T, filter func(t T) bool) (T, error) {
 	return zero, ErrNoValueFound
 }
 
+func Contains[T comparable](vals []T, val T) bool {
+	for _, v := range vals {
+		if v == val {
+			return true
+		}
+	}
+	return false
+}
+
+func ContainsFunc[T any](vals []T, val T, equalFunc func(src, dst T) bool) bool {
+	for _, v := range vals {
+		if equalFunc(v, val) {
+			return true
+		}
+	}
+	return false
+}
+
 // Sum returns the all elements that are found by the filter function.
 func FindAll[T any](vals []T, filter func(t T) bool) ([]T, error) {
 	var results []T
@@ -199,6 +217,16 @@ func Map[In any, Out any](s []In, mapper func(id int, src In) Out) []Out {
 	return res
 }
 
+func ToSet[T comparable](in []T) map[T]struct{} {
+	set := make(map[T]struct{}, len(in))
+
+	for _, el := range in {
+		set[el] = struct{}{}
+	}
+
+	return set
+}
+
 // Get the diff of dsts - srcs
 func DiffSet[T comparable](srcs, dsts []T) []T {
 	srcSet := ToSet(srcs)
@@ -215,12 +243,27 @@ func DiffSet[T comparable](srcs, dsts []T) []T {
 	return diff
 }
 
-func ToSet[T comparable](in []T) map[T]struct{} {
-	set := make(map[T]struct{}, len(in))
-
-	for _, el := range in {
-		set[el] = struct{}{}
+// Get the diff of dsts - srcs
+func DiffSetFunc[T any](srcs, dsts []T, equalFunc func(src, dst T) bool) []T {
+	ret := make([]T, 0, len(dsts))
+	for _, val := range dsts {
+		if !ContainsFunc(srcs, val, func(src, dst T) bool {
+			return equalFunc(src, dst)
+		}) {
+			ret = append(ret, val)
+		}
 	}
+	return deduplicateFunc(ret, equalFunc)
+}
 
-	return set
+func deduplicateFunc[T any](in []T, equalFunc func(src, dst T) bool) []T {
+	newData := make([]T, 0, len(in))
+	for k, v := range in {
+		if !ContainsFunc(in[k+1:], v, func(src, dst T) bool {
+			return equalFunc(src, dst)
+		}) {
+			newData = append(newData, v)
+		}
+	}
+	return newData
 }
